@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "content": {
+      "type": "string",
+      "title": "内容",
+      "x-component": "RichText",
+      "x-decorator": "FormItem",
+      "x-validator": [
+        {
+          "required": true,
+          "triggerType": "onBlur"
+        }
+      ]
+    }
+  }
+}

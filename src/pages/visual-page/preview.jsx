@@ -1,6 +1,7 @@
 import { PureComponent } from 'react'
 
-import * as VisualDesignComponents from 'react-visual-design-components'
+// import * as VisualDesignComponents from 'react-visual-design-components'
+import * as VisualDesignComponents from '@/mobile_components'
 import { map, get } from 'lodash'
 import { geVisualPageById } from '@/service'
 import styles from './preview.less'

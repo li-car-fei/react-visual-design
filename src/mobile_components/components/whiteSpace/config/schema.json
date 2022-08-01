@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "size": {
+      "type": "string",
+      "title": "间距",
+      "x-decorator": "FormItem",
+      "x-component": "Select",
+      "enum": [
+        "xs",
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ]
+    },
+    "backgroundColor": {
+      "type": "string",
+      "title": "背景色",
+      "x-decorator": "FormItem",
+      "x-component": "Input",
+      "x-component-props": {
+        "type": "color"
+      }
+    }
+  }
+}

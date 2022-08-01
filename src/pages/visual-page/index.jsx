@@ -1,13 +1,14 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback } from 'react'
 import { Button, message } from 'antd'
 import styles from './index.less'
 import { FormTable, FormDialog } from '@/components'
 
 import { tableSearchSchema, createTableColumns, modalSchema } from './_config'
-import { addVisualPage, visualPagePaging } from '@/service'
+// import { addVisualPage, visualPagePaging } from '@/service'
+import { addVisualPage, visualPagePaging } from '@/local_service'
 
 export default () => {
-  const formTableEl = useRef(null)
+  const formTableEl = React.createRef()
 
   const onsubmit = useCallback(
     async values => {
@@ -22,7 +23,7 @@ export default () => {
     <div className={styles.page}>
       <FormTable
         rowKey="id"
-        ref={formTableEl}
+        onRef={formTableEl}
         columns={createTableColumns(formTableEl)}
         fetchTableData={visualPagePaging}
         schema={tableSearchSchema}

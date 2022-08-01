@@ -1,0 +1,26 @@
+@import '../style/base.less';
+.visual-design-horizontal-list {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  padding: 20px 12px;
+  overflow: auto;
+  .item {
+    flex-basis: 40%;
+    flex-shrink: 0;
+    margin-right: 20px;
+    img {
+      max-width: 100%;
+    }
+    span {
+      .text-ellipsis(2);
+
+      margin-top: 6px;
+      font-size: 12px;
+    }
+  }
+  .place-holder {
+    flex-shrink: 0;
+    width: 1px;
+  }
+}

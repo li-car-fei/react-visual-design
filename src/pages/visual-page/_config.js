@@ -1,11 +1,17 @@
 import { Button, Modal, message } from 'antd'
 import { Link } from 'umi'
 import { FormDialog } from '@/components'
+// import {
+//   geVisualPageById,
+//   updateVisualPage,
+//   deleteVisualPage,
+// } from '@/service'
+
 import {
   geVisualPageById,
   updateVisualPage,
   deleteVisualPage,
-} from '@/service'
+} from '@/local_service'
 
 
 

@@ -3,13 +3,16 @@ import { Link } from 'umi'
 import * as AntdIcons from '@ant-design/icons'
 import { createForm } from '@formily/core'
 import { v4 } from 'uuid'
-import * as VisualDesignComponents from 'react-visual-design-components'
-import { Iframe } from 'react-visual-design-components'
+// import * as VisualDesignComponents from 'react-visual-design-components'
+// import { Iframe } from 'react-visual-design-components'
+import * as VisualDesignComponents from '@/mobile_components'
+import { Iframe } from '@/mobile_components'
 import { Button, Select, Modal, notification, Popover } from 'antd'
 import _, { find, map, get } from 'lodash'
 import QRCode from 'qrcode.react'
 import { Drag, CompPropSetting, Devices } from '@/components'
-import { geVisualPageById, updateVisualPageData } from '@/service'
+// import { geVisualPageById, updateVisualPageData } from '@/service'
+import { geVisualPageById, updateVisualPageData } from '@/local_service'
 import deviceList from '@/util/device'
 import { arrayIndexForward, arrayIndexBackward } from '@/util/array'
 import styles from './edit.less'
@@ -130,9 +133,11 @@ export default class Index extends PureComponent {
 
   onReceiveMessage = e => {
     try {
-      const data = JSON.parse(e.data)
-      if (_.isFunction(this[data.func])) {
-        this[data.func](data.params)
+      if (e.data.toString() !== '[object Object]') {
+        const data = JSON.parse(e.data)
+        if (_.isFunction(this[data.func])) {
+          this[data.func](data.params)
+        }
       }
     } catch (err) {
       console.error(err)

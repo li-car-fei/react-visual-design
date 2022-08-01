@@ -13,6 +13,9 @@ export default props => {
     return <Alert message="该点击组件无设置属性" type="warning" />
   }
 
+  console.log(schema)
+  console.log(propFormIns)
+
   return (
     <Form form={propFormIns}>
       <FormLayout labelCol={6} wrapperCol={16}>

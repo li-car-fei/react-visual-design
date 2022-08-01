@@ -1,6 +1,7 @@
 import { PureComponent } from 'react'
 import { Alert } from 'antd'
-import * as VisualDesignComponents from 'react-visual-design-components'
+// import * as VisualDesignComponents from 'react-visual-design-components'
+import * as VisualDesignComponents from '@/mobile_components'
 import { map, isEmpty } from 'lodash'
 import { Drop, Icon } from '@/components'
 
@@ -52,9 +53,8 @@ export default class SelectedComp extends PureComponent {
           if (Comp) {
             return (
               <div
-                className={`${styles['comp-wrap']} ${
-                  id === activeCompId ? styles['comp-wrap-active'] : ''
-                }`}
+                className={`${styles['comp-wrap']} ${id === activeCompId ? styles['comp-wrap-active'] : ''
+                  }`}
                 key={id}
                 tabIndex="0"
               >

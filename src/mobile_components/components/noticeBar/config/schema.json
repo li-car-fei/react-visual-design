@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "content": {
+      "type": "string",
+      "title": "内容",
+      "x-decorator": "FormItem",
+      "x-component": "TextArea",
+      "x-validator": [
+        {
+          "triggerType": "onBlur",
+          "required": true
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "src": {
+      "type": "string",
+      "title": "图片地址",
+      "x-decorator": "FormItem",
+      "x-component": "Input",
+      "x-validator": [
+        {
+          "required": true,
+          "format": "url",
+          "triggerType": "onBlur"
+        }
+      ]
+    },
+    "coordinates": {
+      "type": "array",
+      "title": "图片热区",
+      "x-decorator": "FormItem",
+      "x-component": "ImageArea"
+    }
+  }
+}
