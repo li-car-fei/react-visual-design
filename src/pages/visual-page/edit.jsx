@@ -1,4 +1,4 @@
-import { PureComponent } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'umi'
 import * as AntdIcons from '@ant-design/icons'
 import { createForm } from '@formily/core'
@@ -19,124 +19,129 @@ import styles from './edit.less'
 
 const { Option } = Select
 
-let propFormIns
-export default class Index extends PureComponent {
-  state = {
-    dragList: _(Object.values(VisualDesignComponents))
-      .map(v => {
-        const { compAttr } = v
-        if (!compAttr) {
-          return false
-        }
-        const IconComp = AntdIcons[compAttr.iconName || 'StarOutlined']
-        return {
-          ...compAttr,
-          key: compAttr.name,
-          icon: <IconComp />,
-        }
-      })
-      .compact()
-      .value(),
-    selectedList: [],
-    showDrop: false,
-    activeCompId: '',
-    selectedDevice: 'iphone-8',
-  }
-
-  async componentDidMount() {
-    this.pageId = get(this, 'props.location.query.pageId')
-    if (this.pageId) {
-      const res = await geVisualPageById(this.pageId)
-      document.title = res.name
-      this.setState({ selectedList: res.data || [] })
+const dragList = _(Object.values(VisualDesignComponents)).map(
+  v => {
+    const { compAttr } = v
+    if (!compAttr) {
+      return false
+    }
+    const IconComp = AntdIcons[compAttr.iconName || 'StarOutlined']
+    return {
+      ...compAttr,
+      key: compAttr.name,
+      icon: <IconComp />
     }
   }
+).compact().value()
 
-  handleDragStart = () => {
-    this.setState({ showDrop: true })
+let propFormIns
+export default (props) => {
+
+  const [selectedList, setSelectedList] = useState([])
+  const [showDrop, setShowDrop] = useState(false)
+  const [activeCompId, SetActiveCompId] = useState('')
+  const [selectedDevice, setSelectedDevice] = useState('iphone-8')
+
+  const activeComp = useMemo(() => find(selectedList, { id: activeCompId }) || {}, [activeCompId, selectedList])
+  const activeCompSchema = useMemo(() => get(VisualDesignComponents, `${activeComp.name}.propSchema`), [activeComp])
+
+  useEffect(() => {
+    const getByPageId = async (pageId) => {
+      if (pageId) {
+        const res = await geVisualPageById(pageId)
+        document.title = res.name
+        setSelectedList(res.data || [])
+      }
+    }
+    const pageId = props.location.query.pageId
+    getByPageId(pageId)
+  })
+
+  const handleDragStart = () => {
+    setShowDrop(true)
   }
 
-  handleDragEnd = () => {
-    this.setState({ showDrop: false })
+  const handleDragEnd = () => {
+    setShowDrop(false)
   }
 
-  handleApplySetting = async () => {
-    const { activeCompId, selectedList } = this.state
+  const handleApplySetting = async () => {
     const matchComp = find(selectedList, { id: activeCompId })
     if (!matchComp) {
       return false
     }
     try {
       matchComp.data = await propFormIns.submit()
-      return this.setState({ selectedList: [...selectedList] })
+      return setSelectedList([...selectedList])
     } catch (err) {
       return console.error(err)
     }
   }
 
-  handleDeviceChange = val => {
-    this.setState({ selectedDevice: val })
+  const handleDeviceChange = val => {
+    setSelectedDevice(val)
   }
 
-  handleSaveBtnClick = async () => {
-    await updateVisualPageData({ id: this.pageId, data: this.state.selectedList })
+  const handleSaveBtnClick = async () => {
+    await updateVisualPageData({ id: props.location.query.pageId, data: selectedList })
     notification.success({
       message: '保存成功',
       duration: 2,
     })
   }
 
-  handleOperateItem({ type, index }) {
-    const { selectedList } = this.state
+  const handleOperateItem = ({ type, index }) => {
     if (type === 'delete') {
       Modal.confirm({
         title: '确定删除该组件?',
         icon: <AntdIcons.ExclamationCircleOutlined />,
         content: '删除之后,将不能恢复',
         onOk: () => {
-          selectedList.splice(index, 1)
-          this.setState({ selectedList: [...selectedList] })
+          setSelectedList([...(selectedList.splice(index, 1))])
         },
       })
     } else if (type === 'up') {
       const newSelectedList = arrayIndexForward(selectedList, index)
-      this.setState({ selectedList: [...newSelectedList] })
+      setSelectedList([...newSelectedList])
     } else if (type === 'down') {
       const newSelectedList = arrayIndexBackward(selectedList, index)
-      this.setState({ selectedList: [...newSelectedList] })
+      setSelectedList([...newSelectedList])
     }
   }
 
-  handleEditItemClick({ id, compDefaultData }) {
-    const { selectedList, activeCompId } = this.state
-    if (id === activeCompId) {
-      return false
+  const handleEditItemClick = ({ id, compDefaultData }) => {
+    if (id !== activeCompId) {
+      const matchComp = find(selectedList, { id })
+      matchComp.data = matchComp.data || compDefaultData
+      propFormIns = createForm()
+      propFormIns.setValues(_.cloneDeep(matchComp.data), 'overwrite')
+      // return this.setState() before
+      SetActiveCompId(id)
+      setSelectedList([...selectedList])
     }
-    const matchComp = find(selectedList, { id })
-    matchComp.data = matchComp.data || compDefaultData
-    propFormIns = createForm()
-    propFormIns.setValues(_.cloneDeep(matchComp.data), 'overwrite')
-    return this.setState({
-      activeCompId: id,
-      selectedList: [...selectedList],
-    })
   }
 
-  handleDrop = ({ index, name }) => {
-    const { selectedList } = this.state
+  const handleDrop = ({ index, name }) => {
     const id = v4()
-    selectedList.splice(index, 0, { name, id })
-    this.setState({
-      selectedList: [...selectedList],
-    })
+    setSelectedList([...(selectedList.splice(index, 0, { name, id }))])
   }
 
-  onReceiveMessage = e => {
+  const onReceiveMessage = e => {
     try {
       if (e.data.toString() !== '[object Object]') {
         const data = JSON.parse(e.data)
-        if (_.isFunction(this[data.func])) {
-          this[data.func](data.params)
+        switch (data.func) {
+          case 'handleDrop':
+            handleDrop(data.params)
+            break;
+          case 'handleEditItemClick':
+            handleEditItemClick(data.params)
+            break;
+          case 'handleOperateItem':
+            handleOperateItem(data.params)
+            break;
+          default:
+            break
         }
       }
     } catch (err) {
@@ -144,100 +149,95 @@ export default class Index extends PureComponent {
     }
   }
 
-  render() {
-    const { dragList, showDrop, selectedList, activeCompId, selectedDevice } = this.state
-    const activeComp = find(selectedList, { id: activeCompId }) || {}
-    const activeCompSchema = get(VisualDesignComponents, `${activeComp.name}.propSchema`)
-    return (
-      <div className={styles.page}>
-        <section className={styles.head}>
-          <div className={styles.title}>react 可视化设计</div>
-          <div className={styles['operate-region']}>
-            <Button type="primary" onClick={this.handleSaveBtnClick}>
-              保存
-            </Button>
-            <Popover
-              content={
-                <QRCode value={`${qrcodeUrlPrefix}/visual-page/preview?pageId=${this.pageId}`} />
-              }
-              title="保存后可以扫码预览"
-            >
-              <Button>扫码预览</Button>
-            </Popover>
-            <Link to="/visual-page">返回</Link>
-          </div>
-          <div>
-            <a
-              href="https://github.com/react-visual-design/react-visual-design"
-              className={styles['github-link']}
-              target="_blank"
-            />
-          </div>
-        </section>
-        <div className={styles.left}>
-          <div className={styles.title}>组件库</div>
-          <div className={styles.comp}>
-            <p className={styles['comp-title']}>基础组件</p>
-            <Drag
-              data={dragList}
-              renderChild={({ title, icon }) => (
-                <div className={styles['comp-item']}>
-                  {icon}
-                  <span>{title}</span>
-                </div>
-              )}
-              handleDragStart={this.handleDragStart}
-              handleDragEnd={this.handleDragEnd}
-            />
-          </div>
-        </div>
-        <div className={styles.center}>
-          <Select
-            className={styles.deviceSelect}
-            value={selectedDevice}
-            style={{ width: 150 }}
-            onChange={this.handleDeviceChange}
+  return (
+    <div className={styles.page}>
+      <section className={styles.head}>
+        <div className={styles.title}>react 可视化设计</div>
+        <div className={styles['operate-region']}>
+          <Button type="primary" onClick={handleSaveBtnClick}>
+            保存
+          </Button>
+          <Popover
+            content={
+              <QRCode value={`${qrcodeUrlPrefix}/visual-page/preview?pageId=${props.location.query.pageId}`} />
+            }
+            title="保存后可以扫码预览"
           >
-            {map(deviceList, ({ title, value }) => (
-              <Option key={value} value={value}>
-                {title}
-              </Option>
-            ))}
-          </Select>
-
-          <Devices deviceName={selectedDevice}>
-            <Iframe
-              attributes={{
-                src: '/visual-page/checked-comp',
-                width: '100%',
-                height: '100%',
-                frameBorder: 0,
-              }}
-              postMessageData={{ selectedList, showDrop, activeCompId }}
-              handleReceiveMessage={this.onReceiveMessage}
-            />
-          </Devices>
+            <Button>扫码预览</Button>
+          </Popover>
+          <Link to="/visual-page">返回</Link>
         </div>
-        <div className={styles.right}>
-          <div className={styles.title}>
-            <span>属性设置</span>
-            {activeComp.id && (
-              <Button type="primary" onClick={this.handleApplySetting}>
-                应用
-              </Button>
+        <div>
+          <a
+            href="https://github.com/react-visual-design/react-visual-design"
+            className={styles['github-link']}
+            target="_blank"
+          />
+        </div>
+      </section>
+      <div className={styles.left}>
+        <div className={styles.title}>组件库</div>
+        <div className={styles.comp}>
+          <p className={styles['comp-title']}>基础组件</p>
+          <Drag
+            data={dragList}
+            renderChild={({ title, icon }) => (
+              <div className={styles['comp-item']}>
+                {icon}
+                <span>{title}</span>
+              </div>
             )}
-          </div>
-          <div className={styles.content}>
-            <CompPropSetting
-              schema={activeCompSchema}
-              key={activeCompId}
-              id={activeCompId}
-              propFormIns={propFormIns}
-              handlePropChange={this.handlePropChange}
-            />
-          </div>
+            handleDragStart={handleDragStart}
+            handleDragEnd={handleDragEnd}
+          />
         </div>
       </div>
-    )
-  }
+      <div className={styles.center}>
+        <Select
+          className={styles.deviceSelect}
+          value={selectedDevice}
+          style={{ width: 150 }}
+          onChange={handleDeviceChange}
+        >
+          {map(deviceList, ({ title, value }) => (
+            <Option key={value} value={value}>
+              {title}
+            </Option>
+          ))}
+        </Select>
+
+        <Devices deviceName={selectedDevice}>
+          <Iframe
+            attributes={{
+              src: '/visual-page/checked-comp',
+              width: '100%',
+              height: '100%',
+              frameBorder: 0,
+            }}
+            postMessageData={{ selectedList, showDrop, activeCompId }}
+            handleReceiveMessage={onReceiveMessage}
+          />
+        </Devices>
+      </div>
+      <div className={styles.right}>
+        <div className={styles.title}>
+          <span>属性设置</span>
+          {activeComp.id && (
+            <Button type="primary" onClick={handleApplySetting}>
+              应用
+            </Button>
+          )}
+        </div>
+        <div className={styles.content}>
+          <CompPropSetting
+            schema={activeCompSchema}
+            key={activeCompId}
+            id={activeCompId}
+            propFormIns={propFormIns}
+          />
+        </div>
+      </div>
+    </div>
+  )
+
 }
