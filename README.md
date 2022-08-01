@@ -1,3 +1,30 @@
+> 阅读代码并修改的笔记
+
+# 总体架构
+
+基于umi进行架构，`/pages/index.js` 中只有一个link到初始表单页面，根据umi的页面逻辑，`/pages`下的所有jsx文件都能够通过umi路由进行指向并渲染
+
+初始表单页面通过`/components`中的`form-table`与`form-dialog`组件协助，完成表单显示与修改的功能，其中表单选项的操作部分逻辑写在了`_config`文件中，将表单的初始操作对象传进去进行操作
+
+`edit`界面需要完成信息的传递工作，因此需要将组件数据注册在这里，组件操作所有相关函数都写在这里，以便通信之后完成数据的改写操作
+
+中间的显示通过Iframe完成，而Iframe组件只负责新建iframe并完成信息的传递，实际页面显示是通过路由定向到`/visual-page/checked-comp`完成，对应的页面则依靠Drop与`/mobile_components`完成页面渲染，对应的数据操作都`window.parent.postMessage`传递到上层，上层完成对应数据的修改操作
+
+而中间显示页面通过`/mobile_components`封装好的传入`data`进行渲染，右端的修改组件，根据`/mobile_components`预先写好的`schema.json`配合表单属性进行配置，表单组件根据新建的属性与配置完成渲染
+
+# 改写
+- 类组件改写为函数组件，对于this的绑定通过闭包函数方式解决
+- state通过useState完成，生命周期通过useEffect完成
+- message的监听与解除通过useEffect的返回函数完成
+
+
+
+
+
+
+
+
+
 > react 基于组件的可视化设计
 
 ## [demo 地址](https://koki-5ghulbfed42032ec-1301619189.tcloudbaseapp.com/#/visual-page/edit?pageId=807102f66241a729026a85cf5e4b3926)
@@ -10,13 +37,6 @@
 4. 移动端组件基于[antd-mobile](https://mobile.ant.design/)
 5. 数据存储存储基于eggjs [react-visual-design-server](https://github.com/react-visual-design/react-visual-design-server)
 6. 把页面用到的[组件](https://github.com/react-visual-design/react-visual-design-components)封装成lib,发布到npm, 基于[dumi](https://github.com/umijs/dumi)
-
-
-## 页面截图
-
-![效果图1](./README/screen1.jpg)
-![效果图2](./README/screen2.jpg)
-![效果图3](./README/screen3.jpg)
 
 ## to do
 丰富组件库
@@ -33,7 +53,3 @@ yarn start
 # build for production with minification
 yarn build
 ```
-
-
-## Q&A
-有问题可以issue 或者 2788293436@qq.com
