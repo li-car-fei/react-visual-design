@@ -6,15 +6,12 @@ import { SchemaField } from '../'
 
 export default props => {
   const { id, schema, propFormIns } = props
-  if (isEmpty(id)) {
-    return <Alert message="请点击组件设置属性" type="info" />
+  if (isEmpty(id) && !(id)) {
+    return <Alert message="请点击设置属性" type="info" />
   }
   if (isEmpty(schema)) {
-    return <Alert message="该点击组件无设置属性" type="warning" />
+    return <Alert message="请点击编辑或该点击无设置属性" type="warning" />
   }
-
-  console.log(schema)
-  console.log(propFormIns)
 
   return (
     <Form form={propFormIns}>

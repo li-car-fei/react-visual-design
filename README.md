@@ -16,9 +16,66 @@
 - 类组件改写为函数组件，对于this的绑定通过闭包函数方式解决
 - state通过useState完成，生命周期通过useEffect完成
 - message的监听与解除通过useEffect的返回函数完成
+- 外部依赖的移动端组件迁移到`@/mobile_components`下
 
 
 
+> 仿照架构进行图编辑的开发
+
+## 踩坑
+```javascript
+[].push()
+[].splice()
+```
+两个常用的数组方法都是在原数组指针上进行操作，操作后的数据通过原指针访问；
+而`const a = [].push('abc')`会返回`undefined`，`const a = [1,2].splice(0,1)`会返回切下来的`[1]`，而不是我们想要的`[2]`
+
+```javascript
+useEffect(() => {
+    const getByPageId = async (pageId) => {
+      if (pageId) {
+        const res = await geVisualPageById(pageId)
+        document.title = res.name
+        setCounter(res.graphData.counter)
+        setNodes(res.graphData.graph.nodes || [])
+        setEdges(res.graphData.graph.edges || [])
+      }
+    }
+    const pageId = props.location.query.pageId
+    getByPageId(pageId)
+  }, [])
+```
+
+`useEffect()` 当依赖数组为空数组时，则只有在一开始页面第一次渲染会执行一次，当不取值时则任何状态变化都会重新执行
+`useState()` 操作复杂对象时，记得需要用解析赋值
+且在使用`SetState`时是异步操作，所以可以将上传操作等同是异步的调用放在统一函数内的最后，而依赖函数内修改的state的函数则无法同步从对应的state中获得最新的值，因此需要另外传入；同时`useMemo`的值也是需要在异步线程中才更改，无法及时获取，如下：
+```javascript
+// 根据选中的node返回id
+  const activeCompId = useMemo(() => {
+    if (activeNodes[0]) {
+      return activeNodes[0].id
+    }
+    return undefined
+  }, [activeNodes])
+
+// 进入编辑node状态
+  const preSetting = ({ label }) => {
+    console.log(activeNodes[0], activeComId)  // Output: undefined , undefined
+    propFormIns = createForm()
+    propFormIns.setValues({ label })
+  }
+
+  const demoFun = () => {
+    setActiveNodes([{ ...nowChooseNode }])
+    // 传入当前函数内设的新值，否则通过activeNodes[0]将获得旧的值
+    preSetting({ ...nowChooseNode })
+  }
+```
+
+## 参考
+1. 整体组件通信框架基于Iframe
+2. 表单组件基于[Formily 2+ schema](https://v2.formilyjs.org/zh-CN)
+3. 图实时显示组件基于[react-graph-vis](https://github.com/crubier/react-graph-vis)
 
 
 

@@ -7,12 +7,20 @@ class Request {
                 name: 'demo1-vue',
                 description: 'demo1, for test',
                 data: [],
+                graphData: {
+                    'counter': 0,
+                    'graph': { nodes: [], edges: [] }
+                },
                 id: 0
             },
             {
                 name: 'demo2-react',
                 description: 'demo2, for test',
                 data: [],
+                graphData: {
+                    'counter': 0,
+                    'graph': { nodes: [], edges: [] }
+                },
                 id: 1
             }
         ]
@@ -31,6 +39,7 @@ class Request {
     put(data) {
         // new_data = { 'name': data.name, 'description': data.description }
         this.state[data.id]['data'] = data.data
+        this.state[data.id]['graphData'] = data.graphData || {}
     }
 
     delete(data) {
@@ -38,7 +47,7 @@ class Request {
     }
 
     post(data) {
-        this.state.push({ ...data, id: this.state.length, data: [] })
+        this.state.push({ ...data, id: this.state.length, data: [], graphData: {} })
     }
 
     requestBasic(httpType, data = null) {
