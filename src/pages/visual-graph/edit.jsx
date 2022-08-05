@@ -90,6 +90,9 @@ export default (props) => {
 
   // 进入编辑node状态
   const preSetting = ({ label }) => {
+    // 当propFormIns无则新建，有则直接setValues
+    // 由于propFormIns定义在全局中，如果每次都createForm()
+    // 则propFormIn指向每次变化，但下面视图获取的值不是及时更新，导致右端显示前一个propFormIns
     if (!propFormIns) {
       propFormIns = createForm()
     }
