@@ -28,6 +28,8 @@ export default (props) => {
   const [isLinking, setIsLinking] = useState(false)
   // 选择编辑节点
   const [isSetting, setIsSetting] = useState(false)
+  // 正在拖拽
+  const [showDrop, setShowDrop] = useState(false)
   // 根据选中的node返回id
   const activeCompId = useMemo(() => {
     if (activeNodes[0]) {
@@ -178,6 +180,9 @@ export default (props) => {
           case 'handleClearItem':
             handleClearItem()
             break;
+          case 'handleDrop':
+            addRandomNode()
+            break
           default:
             break
         }
@@ -185,6 +190,19 @@ export default (props) => {
     } catch (err) {
       console.error(err)
     }
+  }
+
+  // 拖拽开始
+  const handleDragStart = e => {
+    e.dataTransfer.effectAllowed = 'copy'
+    e.dataTransfer.setData('data', JSON.stringify('add new node through drag'))
+    setShowDrop(true)
+  }
+
+  // 拖拽结束
+  const handleDragEnd = e => {
+    e.dataTransfer.clearData()
+    setShowDrop(false)
   }
 
   return (
@@ -235,6 +253,14 @@ export default (props) => {
             disabled={!(activeNodes.length === 1)}
             onClick={() => { setIsLinking(true) }}>
             连接</Button>
+          <div
+            draggable
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <PlusSquareTwoTone />
+            拖拽
+          </div>
         </div>
       </div>
 
@@ -246,7 +272,7 @@ export default (props) => {
             height: '100%',
             frameBorder: 0,
           }}
-          postMessageData={{ counter, nodes, edges }}
+          postMessageData={{ counter, nodes, edges, showDrop }}
           handleReceiveMessage={onReceiveMessage}
         />
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Graph from "react-graph-vis";
+import { throttle } from 'lodash'
 
 const options = {
     layout: {
@@ -15,10 +16,6 @@ function ShowGraph() {
     const [counter, setCounter] = useState(0)
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
-    // 选中的节点数据
-    // const [activeNodes, setActiveNodes] = useState([])
-    // 选中的边数据
-    // const [activeEdges, setActiveEdges] = useState([])
 
     useEffect(() => {
         const eventListener = e => {
@@ -26,9 +23,6 @@ function ShowGraph() {
             setCounter(data.counter)
             setNodes([...data.nodes])
             setEdges([...data.edges])
-            // console.log(data.counter, data.nodes, data.edges)
-            // setActiveNodes(data.activeNodes)
-            // setActiveEdges(data.activeEdges)
         }
         window.addEventListener('message', eventListener)
 
@@ -37,8 +31,31 @@ function ShowGraph() {
         }
     }, [])
 
-    const createNode = (x, y) => {
-        return false
+
+    const dragOverCallback = throttle(e => {
+        e.dataTransfer.dropEffect = 'copy'
+    }, 1000)
+
+    const handleDragOver = e => {
+        e.preventDefault()
+        e.persist()
+        dragOverCallback(e)
+    }
+
+    const handleDragLeave = e => {
+        // e.currentTarget.classList.remove(styles['dropPlaceHolder-active'])
+        console.log('handleDragLeave')
+    }
+
+    const handleDrop = e => {
+        e.preventDefault()
+        const dataStr = e.dataTransfer.getData('data')
+        const data = JSON.parse(dataStr)
+        console.log(data)
+        window.parent.postMessage(
+            JSON.stringify({ func: 'handleDrop' }),
+            '*'
+        )
     }
 
     // 向上层传递选中的edge或node信息
@@ -79,7 +96,11 @@ function ShowGraph() {
     }
 
     return (
-        <div>
+        <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+        >
             {!!(counter) && (<Graph graph={graph} options={options} events={events} style={{ height: "640px" }} />)}
         </div>
     );

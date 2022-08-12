@@ -47,6 +47,59 @@
 1. 整体组件通信框架基于Iframe
 2. 表单组件基于[Formily 2+ schema](https://v2.formilyjs.org/zh-CN)
 3. 图实时显示组件基于[react-graph-vis](https://github.com/crubier/react-graph-vis)
+4. 拖拽基于[html5 drag&drop 属性](https://developer.mozilla.org/zh-CN/docs/Web/API/HTML_Drag_and_Drop_API)
+
+### 拖拽的简单实现
+
+通过设置拖拽相关的属性，使得元素可以被拖拽，通过`e.dataTransfer.setData()`将拖拽元素的信息传递到接收拖拽的组件事件中
+ps：这里暂无信息可传
+```javascript
+  // 拖拽开始
+  const handleDragStart = e => {
+    e.dataTransfer.effectAllowed = 'copy'
+    e.dataTransfer.setData('data', JSON.stringify('add new node through drag'))
+    setShowDrop(true)
+  }
+
+  // 拖拽结束
+  const handleDragEnd = e => {
+    e.dataTransfer.clearData()
+    setShowDrop(false)
+  }
+
+     <div
+        draggable
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+    >
+        <PlusSquareTwoTone />
+        拖拽
+    </div>
+```
+
+在拖拽的接收组件端，设置允许拖拽放下的相关属性`onDrop`，并按照逻辑将上层传入的信息处理，最后向上发送事件进行处理
+```javascript
+const handleDrop = e => {
+    e.preventDefault()
+    const dataStr = e.dataTransfer.getData('data')
+    const data = JSON.parse(dataStr)
+    console.log(data)               // 'add new node through drag'
+    window.parent.postMessage(
+        JSON.stringify({ func: 'handleDrop' }),
+        '*'
+    )
+}
+
+<div
+    onDragOver={handleDragOver}
+    onDragLeave={handleDragLeave}
+    onDrop={handleDrop}
+    >
+    {!!(counter) && (<Graph graph={graph} options={options} events={events} style={{ height: "640px" }} />)}
+</div>
+```
+
+
 
 
 > 基于JsonSchema的代码表示页面
