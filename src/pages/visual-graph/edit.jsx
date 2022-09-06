@@ -7,6 +7,7 @@ import { Iframe } from '@/mobile_components'
 import { Button, Select, Modal, notification, Popover } from 'antd'
 import _, { find, map, get } from 'lodash'
 import QRCode from 'qrcode.react'
+import AceEditor from 'react-ace';
 import { CompPropSetting } from '@/components'
 import { geVisualPageById, updateVisualPageData } from '@/local_service'
 import { randomGraphData, randomColor, nodeSchema } from './_config'
@@ -205,6 +206,36 @@ export default (props) => {
     setShowDrop(false)
   }
 
+  // JSON Schema 美化
+  const syntaxHighlight = json => {
+    if (typeof json !== 'string') {
+      json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+    const classToColor = {
+      string: 'green',
+      number: 'darkorange',
+      boolean: 'blue',
+      null: 'magenta',
+      key: 'red'
+    }
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+      let cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
+        } else {
+          cls = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return `<span style="color:${classToColor[cls]}">${match}</span>`;
+    });
+  }
+
   return (
     <div className={styles.page}>
       <section className={styles.head}>
@@ -262,6 +293,14 @@ export default (props) => {
             拖拽
           </div>
         </div>
+
+        <div>
+          <div className={styles.title}>JSON Schema</div>
+          <pre className={styles.listBody}>
+            <div dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify({ nodes, edges }, null, 2)) }} ></div>
+          </pre>
+        </div>
+
       </div>
 
       <div className={styles.center}>
