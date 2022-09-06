@@ -149,6 +149,36 @@ export default (props) => {
     }
   }
 
+  // JSON Schema 美化
+  const syntaxHighlight = json => {
+    if (typeof json !== 'string') {
+      json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+    const classToColor = {
+      string: 'green',
+      number: 'darkorange',
+      boolean: 'blue',
+      null: 'magenta',
+      key: 'red'
+    }
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+      let cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
+        } else {
+          cls = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return `<span style="color:${classToColor[cls]}">${match}</span>`;
+    });
+  }
+
   return (
     <div className={styles.page}>
       <section className={styles.head}>
@@ -191,6 +221,14 @@ export default (props) => {
             handleDragEnd={handleDragEnd}
           />
         </div>
+
+        <div>
+          <div className={styles.title}>JSON Schema</div>
+          <pre className={styles.listBody}>
+            <div dangerouslySetInnerHTML={{ __html: syntaxHighlight(JSON.stringify(selectedList, null, 2)) }} ></div>
+          </pre>
+        </div>
+
       </div>
       <div className={styles.center}>
         <Select
