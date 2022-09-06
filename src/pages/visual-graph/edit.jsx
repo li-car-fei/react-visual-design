@@ -57,7 +57,7 @@ export default (props) => {
     }
     const pageId = props.location.query.pageId
     getByPageId(pageId)
-  }, [])
+  }, [props.location.query.pageId])
 
   // 随机初始化
   const setRandomData = async () => {

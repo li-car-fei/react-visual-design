@@ -55,7 +55,16 @@ export default (props) => {
     }
     const pageId = props.location.query.pageId
     getByPageId(pageId)
-  })
+    console.log('effect')
+  }, [props.location.query.pageId, selectedList])
+
+  const handleSaveBtnClick = async () => {
+    await updateVisualPageData({ id: props.location.query.pageId, data: selectedList })
+    notification.success({
+      message: '保存成功',
+      duration: 2,
+    })
+  }
 
   const handleDragStart = () => {
     setShowDrop(true)
@@ -72,6 +81,7 @@ export default (props) => {
     }
     try {
       matchComp.data = await propFormIns.submit()
+      handleSaveBtnClick()
       return setSelectedList([...selectedList])
     } catch (err) {
       return console.error(err)
@@ -80,14 +90,6 @@ export default (props) => {
 
   const handleDeviceChange = val => {
     setSelectedDevice(val)
-  }
-
-  const handleSaveBtnClick = async () => {
-    await updateVisualPageData({ id: props.location.query.pageId, data: selectedList })
-    notification.success({
-      message: '保存成功',
-      duration: 2,
-    })
   }
 
   const handleOperateItem = ({ type, index }) => {
@@ -107,6 +109,8 @@ export default (props) => {
       const newSelectedList = arrayIndexBackward(selectedList, index)
       setSelectedList([...newSelectedList])
     }
+
+    handleSaveBtnClick()
   }
 
   const handleEditItemClick = ({ id, compDefaultData }) => {
@@ -124,6 +128,7 @@ export default (props) => {
   const handleDrop = ({ index, name }) => {
     const id = v4()
     setSelectedList([...(selectedList.splice(index, 0, { name, id }))])
+    handleSaveBtnClick()
   }
 
   const onReceiveMessage = e => {
