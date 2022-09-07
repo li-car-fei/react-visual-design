@@ -195,6 +195,18 @@ export const nodeSchema = {
           "triggerType": "onBlur"
         }
       ]
+    },
+    "color": {
+      "type": "string",
+      "title": "node颜色",
+      "x-component": "Input",
+      "x-decorator": "FormItem",
+      "x-validator": [
+        {
+          "required": true,
+          "triggerType": "onBlur"
+        }
+      ]
     }
   }
 }

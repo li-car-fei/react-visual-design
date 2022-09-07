@@ -12,3 +12,5 @@ export { default as RichText } from './components/richText'
 export { default as WaterMark } from './components/waterMark'
 export { default as WhiteSpace } from './components/whiteSpace'
 export { default as Iframe } from './components/iframe'
+
+export { default as Card } from './components/card'

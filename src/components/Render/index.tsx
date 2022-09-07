@@ -6,7 +6,6 @@ function Render(props: any) {
 
   // 由于mobile_component已经写死，因此不能嵌套render，只能先试着按照数组一轮遍历
   const components = componentRender(props.body, props.data, props.callback)
-  console.log(components)
 
   return (
     (typeof components === 'string') ? (
