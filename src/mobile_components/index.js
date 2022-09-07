@@ -14,3 +14,4 @@ export { default as WhiteSpace } from './components/whiteSpace'
 export { default as Iframe } from './components/iframe'
 
 export { default as Card } from './components/card'
+export { default as List } from './components/list'

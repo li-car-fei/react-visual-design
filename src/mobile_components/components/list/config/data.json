@@ -1,0 +1,23 @@
+{
+    "header": "列表标题",
+    "array": [
+        {
+            "content": "内容一", 
+            "description":"", 
+            "title": "标题一", 
+            "clickable": true
+        },
+        {
+            "content": "内容二", 
+            "description":"描述二", 
+            "title": "", 
+            "clickable": false
+        },
+        {
+            "content": "内容三", 
+            "description":"描述三", 
+            "title": "标题三", 
+            "clickable": true
+        }
+    ]
+}

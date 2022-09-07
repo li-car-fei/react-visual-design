@@ -1,0 +1,90 @@
+{
+  "type": "object",
+  "properties": {
+    "header": {
+      "type": "string",
+      "title": "List标题",
+      "x-decorator": "FormItem",
+      "x-component": "Input",
+      "x-validator": [
+        {
+          "triggerType": "onBlur"
+        }
+      ]
+    },
+    "array": {
+        "type": "array",
+        "x-decorator": "FormItem",
+        "x-component": "ArrayCards",
+        "items": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "title": "小标题",
+                    "x-decorator": "FormItem",
+                    "x-component": "Input",
+                    "x-validator": [
+                        {
+                            "triggerType": "onBlur"
+                        }
+                    ]
+                },
+                "content":{
+                    "type": "string",
+                    "title": "内容",
+                    "x-decorator": "FormItem",
+                    "x-component": "Input",
+                    "x-validator": [
+                        {
+                            "required": true,
+                            "triggerType": "onBlur"
+                        }
+                    ]
+                },
+                "description": {
+                    "type": "string",
+                    "title": "描述",
+                    "x-decorator": "FormItem",
+                    "x-component": "Input",
+                    "x-validator": [
+                        {
+                            "triggerType": "onBlur"
+                        }
+                    ]
+                },
+                "clickable": {
+                    "type": "bool",
+                    "title": "可点击",
+                    "x-decorator": "FormItem",
+                    "x-component": "Switch",
+                    "x-validator": [
+                        {
+                            "required": true
+                        }
+                    ]
+                },
+                "remove": {
+                    "type": "void",
+                    "x-component": "ArrayCards.Remove"
+                },
+                "moveUp": {
+                    "type": "void",
+                    "x-component": "ArrayCards.MoveUp"
+                },
+                "moveDown": {
+                    "type": "void",
+                    "x-component": "ArrayCards.MoveDown"
+                }
+            }
+        },
+        "properties": {
+            "addition": {
+                "type": "void",
+                "title": "添加一项",
+                "x-component": "ArrayCards.Addition"
+            }
+        }
+    }
+  }
+}

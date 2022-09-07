@@ -17,13 +17,14 @@ export default class NewCard extends PureComponent {
         data: defaultData,
     }
 
+    // 类静态属性
     static compAttr = {
         name: 'Card',
         id: 'card',
         title: '卡片',
         iconName: 'HddOutlined'
     }
-
+    // 类静态属性
     static propSchema = propSchema
 
     render() {
