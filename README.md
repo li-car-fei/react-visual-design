@@ -109,10 +109,14 @@ const handleDrop = e => {
 
 > 基于sketch2code AI 模型的无代码实现
 
-通过AI输出DSL，完成转译后实现页面；
+## 基于sketch2code AI 模型的无代码实现 
+
+过AI输出DSL，完成转译后实现页面；
 用到的AI模型以及后端简单代码：[sketch2code](https://github.com/li-car-fei/sketch2code)
 
 dsl设计简单，仅做演示与学习用～
+
+![no-code](./README/4.png)
 
 ## to do
 丰富组件库
