@@ -1,0 +1,18 @@
+{
+  "{": false,
+  "}": false,
+  "body": false,
+  "header": "NavBar",
+  "btn-active": "Picker",
+  "btn-inactive": "Picker",
+  "row": "row",
+  "single": "nextAdd",
+  "double": "nextAdd",
+  "quadruple": "nextAdd",
+  "btn-green": "Picker",
+  "btn-orange": "Picker",
+  "btn-red": "Picker",
+  "big-title": "IconFont",
+  "small-title": "NoticeBar",
+  "text": "RichTex"
+}

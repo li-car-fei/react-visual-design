@@ -8,4 +8,5 @@ export { default as SchemaField } from './schema-field'
 export { default as FormTable } from './form-table'
 export { default as FormDialog } from './form-dialog'
 export { default as ErrorBoundary } from './error-boundary'
+export { default as NocodePost } from './nocode-post/index'
 

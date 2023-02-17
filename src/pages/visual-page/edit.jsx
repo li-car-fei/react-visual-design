@@ -10,7 +10,7 @@ import { Iframe } from '@/mobile_components'
 import { Button, Select, Modal, notification, Popover } from 'antd'
 import _, { find, map, get } from 'lodash'
 import QRCode from 'qrcode.react'
-import { Drag, CompPropSetting, Devices } from '@/components'
+import { Drag, CompPropSetting, Devices, NocodePost } from '@/components'
 // import { geVisualPageById, updateVisualPageData } from '@/service'
 import { geVisualPageById, updateVisualPageData } from '@/local_service'
 import deviceList from '@/util/device'
@@ -58,8 +58,9 @@ export default (props) => {
     console.log('effect')
   }, [props.location.query.pageId, selectedList])
 
-  const handleSaveBtnClick = async () => {
-    await updateVisualPageData({ id: props.location.query.pageId, data: selectedList })
+  const handleSaveBtnClick = async (list = null) => {
+    const updateList = list || selectedList
+    await updateVisualPageData({ id: props.location.query.pageId, data: updateList })
     notification.success({
       message: '保存成功',
       duration: 2,
@@ -81,8 +82,8 @@ export default (props) => {
     }
     try {
       matchComp.data = await propFormIns.submit()
-      handleSaveBtnClick()
-      return setSelectedList([...selectedList])
+      setSelectedList([...selectedList])
+      return handleSaveBtnClick()
     } catch (err) {
       return console.error(err)
     }
@@ -154,6 +155,12 @@ export default (props) => {
     }
   }
 
+  // ai识别结果同步
+  const handleNodePost = async dataList => {
+    setSelectedList([...dataList])
+    handleSaveBtnClick([...dataList])
+  }
+
   // JSON Schema 美化
   const syntaxHighlight = json => {
     if (typeof json !== 'string') {
@@ -211,6 +218,8 @@ export default (props) => {
         </div>
       </section>
       <div className={styles.left}>
+        <div className={styles.title}>ai识别</div>
+        <NocodePost handleNodePost={handleNodePost} />
         <div className={styles.title}>组件库</div>
         <div className={styles.comp}>
           <p className={styles['comp-title']}>基础组件</p>
