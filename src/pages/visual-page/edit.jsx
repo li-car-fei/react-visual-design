@@ -56,7 +56,7 @@ export default (props) => {
     const pageId = props.location.query.pageId
     getByPageId(pageId)
     console.log('effect')
-  }, [props.location.query.pageId, selectedList])
+  }, [props.location.query.pageId])
 
   const handleSaveBtnClick = async (list = null) => {
     const updateList = list || selectedList
@@ -83,7 +83,7 @@ export default (props) => {
     try {
       matchComp.data = await propFormIns.submit()
       setSelectedList([...selectedList])
-      return handleSaveBtnClick()
+      return handleSaveBtnClick([...selectedList])
     } catch (err) {
       return console.error(err)
     }
@@ -100,18 +100,21 @@ export default (props) => {
         icon: <AntdIcons.ExclamationCircleOutlined />,
         content: '删除之后,将不能恢复',
         onOk: () => {
-          setSelectedList([...(selectedList.splice(index, 1))])
+          selectedList.splice(index, 1)
+          const newSelectedList = [...selectedList]
+          setSelectedList(newSelectedList)
+          handleSaveBtnClick(newSelectedList)
         },
       })
     } else if (type === 'up') {
       const newSelectedList = arrayIndexForward(selectedList, index)
       setSelectedList([...newSelectedList])
+      handleSaveBtnClick([...newSelectedList])
     } else if (type === 'down') {
       const newSelectedList = arrayIndexBackward(selectedList, index)
       setSelectedList([...newSelectedList])
+      handleSaveBtnClick([...newSelectedList])
     }
-
-    handleSaveBtnClick()
   }
 
   const handleEditItemClick = ({ id, compDefaultData }) => {
@@ -128,8 +131,10 @@ export default (props) => {
 
   const handleDrop = ({ index, name }) => {
     const id = v4()
-    setSelectedList([...(selectedList.splice(index, 0, { name, id }))])
-    handleSaveBtnClick()
+    selectedList.splice(index, 0, { name, id })
+    const newSetSelectList = [...selectedList]
+    setSelectedList([...newSetSelectList])
+    handleSaveBtnClick([...newSetSelectList])
   }
 
   const onReceiveMessage = e => {
@@ -196,7 +201,7 @@ export default (props) => {
       <section className={styles.head}>
         <div className={styles.title}>react 可视化设计</div>
         <div className={styles['operate-region']}>
-          <Button type="primary" onClick={handleSaveBtnClick}>
+          <Button type="primary" onClick={e => handleSaveBtnClick()}>
             保存
           </Button>
           <Popover

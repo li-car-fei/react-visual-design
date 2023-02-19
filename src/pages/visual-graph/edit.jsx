@@ -74,8 +74,11 @@ export default (props) => {
   }
 
   // 保存图数据到后台
-  const handleSaveBtnClick = async () => {
-    await updateVisualPageData({ id: props.location.query.pageId, graphData: { counter, graph: { nodes, edges } } })
+  const handleSaveBtnClick = async (inCounter = null, inNodes = null, inEdges = null) => {
+    const postCounter = inCounter || counter;
+    const postNodes = inNodes || nodes;
+    const postEdges = inEdges || edges;
+    await updateVisualPageData({ id: props.location.query.pageId, graphData: { counter: postCounter, graph: { nodes: postNodes, edges: postEdges } } })
     notification.success({
       message: '保存成功',
       duration: 2,
@@ -88,7 +91,7 @@ export default (props) => {
     const node = find(nodes, { id: activeNodes[0].id })
     node.label = data.label
     setNodes([...nodes])
-    handleSaveBtnClick()
+    handleSaveBtnClick(null, [...nodes], null)
   }
 
   // 进入编辑node状态
@@ -147,16 +150,17 @@ export default (props) => {
       setCounter(count => count - 1)
       nodes.splice(nodeIndex, 1)
       setNodes([...nodes])
-      setEdges([...(_.remove(edges, item => ((item.from !== activeNodes[0].id) && (item.to !== activeNodes[0].id))))])
+      const newEdges = _.remove(edges, item => ((item.from !== activeNodes[0].id) && (item.to !== activeNodes[0].id)))
+      setEdges([...newEdges])
       setActiveNodes([])
-      handleSaveBtnClick()
+      handleSaveBtnClick(counter - 1, [...nodes], [...newEdges])
     } else {
       // 删除edge即可
       const edgeIndex = _.findIndex(edges, item => item.id === activeEdges[0].id)
       edges.splice(edgeIndex, 1)
       setEdges([...edges])
       setActiveEdges([])
-      handleSaveBtnClick()
+      handleSaveBtnClick(null, null, [...edges])
     }
   }
 
@@ -166,7 +170,7 @@ export default (props) => {
     setCounter(count => count + 1)
     nodes.push({ ...addNode })
     setNodes([...nodes])
-    handleSaveBtnClick()
+    handleSaveBtnClick(counter - 1, [...nodes], null)
   }
 
   // 处理show-graph视图传来的事件
@@ -241,7 +245,7 @@ export default (props) => {
       <section className={styles.head}>
         <div className={styles.title}>react 可视化设计</div>
         <div className={styles['operate-region']}>
-          <Button type="primary" onClick={handleSaveBtnClick}>
+          <Button type="primary" onClick={e => handleSaveBtnClick()}>
             保存
           </Button>
           <Popover
